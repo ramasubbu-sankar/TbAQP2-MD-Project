@@ -1,0 +1,94 @@
+;  SIMULATED ANNEALING
+;
+;  PREPROCESSING OPTIONS
+; include                =
+; define                 =
+;
+;  RUN PARAMETERS 
+integrator               = md            ; leap-frog integrator
+nsteps                   = 1000000       ; 0.001 * 1 000 000 = 1 000 ps = 1 ns
+dt                       = 0.001         ; 1 fs
+;
+;  OUTPUT CONTROL
+; Output frequency for coords (x), velocities (v) and forces (f) = *.trr
+;
+nstxout         = 100000  ; [steps] save coordinates every 1000 ps 
+nstvout         = 100000  ; [steps] write velocities every 1000 ps
+nstfout         = 100000  ; [steps] write forces every 1000 ps 
+;
+; Output frequency for coordinates = *.xtc
+;
+nstxout-compressed  = 100    ;  [steps] save position coordinates every 0.1 ps
+compressed-x-grps   = System
+;
+; Output frequency for energies to log and energy file = *.log and *.edr
+;
+nstlog              =  100                         ; [steps] update log file every 0.1 ps
+nstenergy           =  100                         ; [steps] save energies every 0.1 ps
+energygrps          =  SOLU_MEMB  SOLV   ; group(s) for which to write short-ranged non-bonded Epot to the energy file
+;
+;  BOND PARAMETERS
+continuation            = no            ; new run, apply constraints to the start configuration and reset shells
+constraint_algorithm    = lincs         ; holonomic constraints
+constraints             = none          ; no constraints except for those defined explicitly in the topology 
+lincs_iter              = 1             ; accuracy of LINCS
+lincs_order             = 4             ; Highest order in the expansion of the constraint coupling matrix
+lincs-warnangle         = 30            ; [deg] maximum angle that a bond can rotate before LINCS will complain
+morse                   = no            ; bonds are represented by a harmonic potential and not morse potential  
+;
+;  NEIGHBOR SEARCHING
+;
+cutoff-scheme       =  Verlet ; Generate a pair list with buffering (other option group)
+ns_type             =  grid   ; Method to determine neighbor list (simple, grid)
+nstlist             =  20      ; Frequency to update neighbor list and long range forces
+;
+;  ELECTROSTATICS AND VdWAALS
+;
+coulombtype         =  PME
+pme_order           =  4                        ; cubic interpolation (other options available)
+vdwtype             =  Cut-off
+vdw-modifier        =  Potential-shift-Verlet  ; elects Potential-shift with the Verlet cutoff-scheme, as it is (nearly) free
+rcoulomb            =  1.2                      ; [nm] distance for the coulomb cut-off
+rvdw                =  1.2                      ; [nm] distance for the vdw cut-off
+epsilon_r           =  1                        ; The relative dielectric constant( 0=infinity)
+fourierspacing      =  0.16                     ; grid spacing for FFT
+;
+; TEMPERATURE COUPLING (is on)
+tcoupl          = berendsen                  ; modified Berendsen thermostat
+tc-grps         = SOLU_MEMB SOLV   ; two coupling groups - more accurate
+tau_t           = 0.1     0.1                ; [ps] time constant for temp. coupling
+ref_t           = 310     310                ; [K] reference temperature, one for each group
+;
+; PRESSURE COUPLING  (is on in MD production run)
+pcoupl              =  Berendsen          ; Pressure coupling on
+tau-p               = 1.0
+pcoupltype          = semiisotropic      ; uniform scaling (isotropic) not appropriate for membranes
+ref_p               = 1.0     1.0        ; [bar] reference pressure
+compressibility     = 4.5e-5  4.5e-5     ; [bar^-1] isothermal compressibility
+;
+; CENTER OF MASS (COM) MOTION REMOVAL
+; to prevent drifting of the protein-bilayer in opposite direction as water-ions
+;
+nstcomm   = 1
+comm-mode = Linear
+comm-grps = SOLU_MEMB SOLV 
+;
+; PERIODIC BOUNDARY CONDITIONS
+pbc             = xyz           ; 3-D PBC
+;
+; DISPERSION CORRECTION
+DispCorr        = EnerPres      ; apply long range dispersion corrections for Energy and Pressure
+;
+; VELOCITY GENERATION is off
+gen_vel         = yes       ; we start new run
+gen-temp        = 2
+gen-seed        = -1 
+;
+; SIMULATED ANNEALING CONTROL = 
+annealing                = 6 6
+annealing_time           = 0 175 450 625 750 1000 0 175 450 625 750 1000
+annealing_temp           = 50 100 150 200 250 310  50 100 150 200 250 310
+
+
+
+

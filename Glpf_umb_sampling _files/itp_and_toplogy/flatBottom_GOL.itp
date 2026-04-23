@@ -1,0 +1,5 @@
+; Position restraint for substrate
+[ position_restraints ]
+; i funct g r k
+3 2 2 0.5 10000
+
