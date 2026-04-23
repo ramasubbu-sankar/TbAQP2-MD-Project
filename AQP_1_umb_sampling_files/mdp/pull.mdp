@@ -1,0 +1,67 @@
+title                   = Umbrella pulling simulation
+define                  = -DPOSRES -DPOSRES_FC_BB=0.0 -DPOSRES_FC_SC=0.0 -DPOSRES_FC_LIPID=0.0 -DDIHRES -DDIHRES_FC=0.0 -DGOL_mol=0.0 -DPORSE_PULL
+; Run parameters
+integrator              = md
+dt                      = 0.002
+tinit                   = 0
+nsteps                  = 6000000   ; 12000 ps
+nstcomm                 = 10
+; Output parameters
+nstxout-compressed      = 1000      ; every 2 ps
+nstxout                 = 1000      ; every 1 ps
+nstvout                 = 000
+nstfout                 = 000
+nstenergy               = 500
+; Bond parameters
+constraint_algorithm    = lincs
+constraints             = all-bonds
+continuation            = yes       ; continuing from NPT 
+; Single-range cutoff scheme
+cutoff-scheme           = Verlet
+nstlist                 = 20 
+ns_type                 = grid 
+rlist                   = 1.2
+rcoulomb                = 1.2
+rvdw                    = 1.2
+; PME electrostatics parameters
+coulombtype             = PME
+fourierspacing          = 0.12
+fourier_nx              = 0
+fourier_ny              = 0
+fourier_nz              = 0
+pme_order               = 4
+ewald_rtol              = 1e-5
+optimize_fft            = yes
+; Nose-Hoover temperature coupling is on in three groups
+tcoupl                  = Nose-Hoover
+tc_grps                 = Protein_GOL POPE SOD_CLA_TIP3
+tau_t                   = 1.0 1.0 1.0
+ref_t                   = 310 310 310
+; Pressure coupling is on
+pcoupl                  = Parrinello-Rahman
+pcoupltype              = semiisotropic 
+tau_p                   = 2.0
+compressibility         = 4.5e-5  4.5e-5
+ref_p                   = 1.0     1.0
+refcoord_scaling        = com
+; Generate velocities is on
+gen_vel                 = no 
+; Periodic boundary conditions are on in all directions
+pbc                     = xyz
+; Long-range dispersion correction
+DispCorr                = EnerPres
+; Pull code
+pull                    = yes
+pull-nstxout            = 500
+pull-nstfout            = 500
+pull_ncoords            = 1         ; only one reaction coordinate 
+pull_ngroups            = 2         ; two groups defining one reaction coordinate
+pull_group1_name        = tm_ca
+pull_group2_name        = GOL
+pull_coord1_type        = umbrella  ; harmonic potential
+pull_coord1_geometry    = direction  ; pull along the vector connecting the two group
+pull_coord1_vec         = 0.0 0.0 -1.0
+pull_coord1_groups      = 1 2
+pull_coord1_start       = yes       ; define initial COM distance > 0
+pull_coord1_rate        = 0.0005    ; 0.0005 nm per ps = 0.5 nm per ns
+pull_coord1_k           = 5000      ; kJ mol^-1 nm^-2
